@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 
@@ -12,14 +13,13 @@ def load_data(file_path: str) -> pd.DataFrame:
         pd.DataFrame: Loaded dataset.
 
     Raises:
-        FileNotFoundError: If file is not found.
+        FileNotFoundError: If file does not exist.
         ValueError: If dataset is empty.
     """
-
-    try:
-        df = pd.read_csv(file_path)
-    except FileNotFoundError:
+    if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
+
+    df = pd.read_csv(file_path)
 
     if df.empty:
         raise ValueError("Loaded dataset is empty.")
