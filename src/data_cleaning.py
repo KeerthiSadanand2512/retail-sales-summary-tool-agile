@@ -41,7 +41,43 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     # Fill discount missing with 0 (assumption: no discount recorded => 0)
     if "Discount" in df_clean.columns:
         df_clean["Discount"] = df_clean["Discount"].fillna(0)
+        return df_clean
+
+def validate_numeric_columns(df: pd.DataFrame) -> pd.DataFrame:
+    df_clean = df.copy()
+
+    for col in ["Sales", "Profit", "Quantity", "Discount"]:
+        if col in df_clean.columns:
+            df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
+        else:
+            if col == "Discount":
+                df_clean["Discount"] = 0.0
+            else:
+                raise KeyError(f"Missing expected numeric column: '{col}'")
+
+    df_clean = df_clean.dropna(subset=["Sales", "Profit", "Quantity", "Discount"])
+
+    df_clean["Quantity"] = df_clean["Quantity"].astype(int)
 
     return df_clean
+def clean_data(df: pd.DataFrame) -> pd.DataFrame:
+    df1 = convert_dates(df)
+    df2 = handle_missing_values(df1)
+    df3 = validate_numeric_columns(df2)
+    return df3
 
+if __name__ == "__main__":
+    # Simple structure test
+    test_df = pd.DataFrame({
+        "Order Date": ["01/01/2020"],
+        "Ship Date": ["01/02/2020"],
+        "Sales": ["100"],
+        "Profit": ["10"],
+        "Quantity": ["2"],
+        "Discount": [None]
+    })
 
+    cleaned = clean_data(test_df)
+
+    print("Cleaned Data:")
+    print(cleaned.head())
