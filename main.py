@@ -3,8 +3,7 @@
 #User Story 1 (Task 11)
 from src.data_loader import load_data
 from src.data_cleaning import convert_dates, handle_missing_values, validate_numeric_columns # data cleaning function
-from src.sales_summary import total_sales
-from src.sales_summary import sales_by_region
+from src.sales_summary import total_sales, sales_by_region, sales_by_category
 
 def main():
     try:
@@ -35,6 +34,11 @@ def main():
         region_sales = sales_by_region(df)
         print("Sales by Region:")
         print(region_sales)
+
+        #Calculate sales by categories
+        category_sales = sales_by_category(df)
+        print("Sales by Category:")
+        print(category_sales)
 
     except Exception as e:
         print("Error:", e)
