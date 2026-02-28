@@ -98,27 +98,6 @@ def sales_by_category(df: pd.DataFrame) -> pd.DataFrame:
 )
 
     return category_sales
-def calculate_total_sales(df: pd.DataFrame) -> pd.DataFrame:
-    total = df["Sales"].sum()
-
-    result = pd.DataFrame({
-        "Metric": ["Total Sales"],
-        "Value": [total]
-    })
-
-    return result
-
-
-def sales_by_region(df: pd.DataFrame) -> pd.DataFrame:
-    result = df.groupby("Region")["Sales"].sum().reset_index()
-    result.rename(columns={"Sales": "Total Sales"}, inplace=True)
-    return result
-
-
-def sales_by_category(df: pd.DataFrame) -> pd.DataFrame:
-    result = df.groupby("Category")["Sales"].sum().reset_index()
-    result.rename(columns={"Sales": "Total Sales"}, inplace=True)
-    return result
 
 def sales_summary_report(df: pd.DataFrame) -> dict:
     """
