@@ -82,6 +82,13 @@ def sales_by_category(df: pd.DataFrame) -> pd.DataFrame:
     if not required_columns.issubset(df.columns):
         missing = required_columns - set(df.columns)
         raise KeyError(f"Missing required column(s): {missing}")
+    #Clean category column
+    df["Category"] = (
+        df["Category"]
+        .astype(str)
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True) #removes double spaces
+    )
 
     sales_series = pd.to_numeric(df["Sales"], errors="coerce")
 
