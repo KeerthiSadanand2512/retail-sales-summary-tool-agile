@@ -25,3 +25,43 @@ def total_sales(df: pd.DataFrame) -> float:
         raise ValueError("Total sales could not be calculated (no valid Sales values).")
 
     return total
+
+#def sales_by_region(df):
+    # Group by Region and sum Sales
+    region_sales = df.groupby("Region")["Sales"].sum()
+
+    return region_sales
+
+def sales_by_region(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate total sales grouped by region from the Superstore dataset.
+
+    Args:
+        df: Cleaned Superstore DataFrame with 'Region' and 'Sales' columns.
+
+    Returns:
+        DataFrame with total sales per region sorted in descending order.
+
+    Raises:
+        KeyError: If required columns are missing.
+        ValueError: If no valid numeric sales values are found.
+    """
+    required_columns = {"Region", "Sales"}
+
+    if not required_columns.issubset(df.columns):
+        missing = required_columns - set(df.columns)
+        raise KeyError(f"Missing required column(s): {missing}")
+
+    sales_series = pd.to_numeric(df["Sales"], errors="coerce")
+
+    if sales_series.dropna().empty:
+        raise ValueError("No valid numeric Sales values found.")
+
+    region_sales = (
+        df.assign(Sales=sales_series)
+          .groupby("Region", as_index=False)["Sales"]
+          .sum()
+          .sort_values(by="Sales", ascending=False)
+    )
+
+    return region_sales
