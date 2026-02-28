@@ -3,6 +3,7 @@
 #User Story 1 (Task 11)
 from src.data_loader import load_data
 from src.data_cleaning import convert_dates, handle_missing_values, validate_numeric_columns # data cleaning function
+from src.sales_summary import total_sales
 
 def main():
     try:
@@ -22,6 +23,11 @@ def main():
         print("Number of rows after cleaning:", len(df))
         print("Dataset After Cleaning:")
         print(df.head())
+        print(100*"=")
+
+        # Calculate total sales
+        total = total_sales(df)
+        print("Total sales:", total)
         print(100*"=")
 
     except Exception as e:
