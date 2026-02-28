@@ -53,11 +53,13 @@ def sales_by_region(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("No valid numeric Sales values found.")
 
     region_sales = (
-        df.assign(Sales=sales_series)
-          .groupby("Region", as_index=False)["Sales"]
-          .sum()
-          .sort_values(by="Sales", ascending=False)
-    )
+    df.assign(Sales=sales_series)
+      .groupby("Region", as_index=False)["Sales"]
+      .sum()
+      .rename(columns={"Sales": "Total Sales"})
+      .sort_values(by="Total Sales", ascending=False)
+      .reset_index(drop=True)
+)
 
     return region_sales
 
@@ -87,11 +89,13 @@ def sales_by_category(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("No valid numeric Sales values found.")
 
     category_sales = (
-        df.assign(Sales=sales_series)
-          .groupby("Category", as_index=False)["Sales"]
-          .sum()
-          .sort_values(by="Sales", ascending=False)
-    )
+    df.assign(Sales=sales_series)
+      .groupby("Category", as_index=False)["Sales"]
+      .sum()
+      .rename(columns={"Sales": "Total Sales"})
+      .sort_values(by="Total Sales", ascending=False)
+      .reset_index(drop=True)
+)
 
     return category_sales
 def calculate_total_sales(df: pd.DataFrame) -> pd.DataFrame:
@@ -115,3 +119,14 @@ def sales_by_category(df: pd.DataFrame) -> pd.DataFrame:
     result = df.groupby("Category")["Sales"].sum().reset_index()
     result.rename(columns={"Sales": "Total Sales"}, inplace=True)
     return result
+
+def sales_summary_report(df: pd.DataFrame) -> dict:
+    """
+    Return a structured sales report as reusable objects.
+    No printing—only returns results.
+    """
+    return {
+        "total_sales": total_sales(df),
+        "sales_by_region": sales_by_region(df),
+        "sales_by_category": sales_by_category(df),
+    }
