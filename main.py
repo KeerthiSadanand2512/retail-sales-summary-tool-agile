@@ -1,17 +1,20 @@
 from src.data_loader import load_data
 from src.data_cleaning import convert_dates, handle_missing_values, validate_numeric_columns
 from src.sales_summary import sales_summary_report
-
+from src.profit_analysis import profit_report
 
 def main():
-    try:
+    try:    
         # When you run: python3 src/main.py 
         # the working folder is the project root, so use this path:
+
+        # Data Loading
         df = load_data("data/superstore.csv")
         print("Data loaded successfully!")
         print("Number of rows:", len(df))
         print(df.head())
         print(100*"=")
+
 
         df = convert_dates(df)
         df = handle_missing_values(df)
@@ -21,6 +24,7 @@ def main():
         print(df.head())
         print(100*"=")
 
+        # Sales Summary Report
         report = sales_summary_report(df)
 
         print("=== Total Sales ===")
@@ -35,6 +39,35 @@ def main():
         print(report["sales_by_category"])
         print(100*"=")
 
+
+        # Profit Analysis Report
+        report = profit_report(df)
+
+        # ---- validations ----
+        
+        assert isinstance(report["total_profit"], float)
+
+        assert not report["profit_by_category"].empty
+        assert "Category" in report["profit_by_category"].columns
+        assert "Total Profit" in report["profit_by_category"].columns
+
+        assert not report["profit_by_sub_category"].empty
+        assert "Sub-Category" in report["profit_by_sub_category"].columns
+        assert "Total Profit" in report["profit_by_sub_category"].columns
+       
+        # ---- Print Results ----
+        print("Profit Report Generated Successfully")
+        print("Total Profit:", report["total_profit"])
+        print(100*"=")
+
+        print("\nProfit by Category (Top 5):")
+        print(report["profit_by_category"].head(5))
+        print(100*"=")
+
+        print("\nProfit by Sub-Category (Top 5):")
+        print(report["profit_by_sub_category"].head(5))
+        print(100*"=")
+        # Catch any unexpected exceptions to prevent crashing and provide feedback
     except Exception as e:
         print("Error:", e)
 

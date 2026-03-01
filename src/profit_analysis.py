@@ -1,30 +1,23 @@
 import pandas as pd
 
 
-def total_profit(df: pd.DataFrame) -> pd.DataFrame:
+def total_profit(df: pd.DataFrame) -> float:
     """
     Calculate total profit from the dataset.
 
     Returns:
-        A structured DataFrame with:
-        - Metric
-        - Value
+        Total profit as a float.
     """
-
     if "Profit" not in df.columns:
         raise KeyError("Missing required column: 'Profit'")
 
-    # Ensure Profit is numeric
     profit_series = pd.to_numeric(df["Profit"], errors="coerce")
+    total = float(profit_series.sum(skipna=True))
 
-    total = profit_series.sum()
+    if pd.isna(total):
+        raise ValueError("Total profit could not be calculated (no valid Profit values).")
 
-    result = pd.DataFrame({
-        "Metric": ["Total Profit"],
-        "Value": [total]
-    })
-
-    return result
+    return total
 
 
 def profit_by_category(df: pd.DataFrame) -> pd.DataFrame:
@@ -61,39 +54,31 @@ def profit_by_category(df: pd.DataFrame) -> pd.DataFrame:
 
     return summary
 
-def profit_by_subcategory(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculate total profit by sub-category from the Superstore dataset.
+def profit_by_sub_category(df: pd.DataFrame) -> pd.DataFrame:
+    required_columns = {"Sub-Category", "Profit"}
+    missing = required_columns - set(df.columns)
+    if missing:
+        raise KeyError(f"Missing required column(s): {sorted(missing)}")
 
-    Args:
-        df: Cleaned Superstore DataFrame with 'Sub-Category' and 'Profit' columns.
-
-    Returns:
-        DataFrame with columns:
-            - Sub-Category
-            - Profit
-
-    Raises:
-        KeyError: If required columns are missing.
-        ValueError: If Profit contains no valid numeric values.
-    """
-
-    required_columns = ["Sub-Category", "Profit"]
-    for col in required_columns:
-        if col not in df.columns:
-            raise KeyError(f"Missing required column: '{col}'")
-
-    profit_series = pd.to_numeric(df["Profit"], errors="coerce") #profit is numeric
-
-    if profit_series.isna().all():
+    profit_series = pd.to_numeric(df["Profit"], errors="coerce")
+    if profit_series.dropna().empty:
         raise ValueError("Profit could not be calculated (no valid Profit values).")
 
-    Profit_SubCategory = (
+    summary = (
         df.assign(Profit=profit_series)
-        .groupby("Sub-Category", as_index=False)["Profit"]
-        .sum()
-        .sort_values(by="Profit", ascending=False)
-        .reset_index(drop=True)
+          .groupby("Sub-Category", as_index=False)["Profit"]
+          .sum()
+          .rename(columns={"Profit": "Total Profit"})
+          .sort_values(by="Total Profit", ascending=False)
+          .reset_index(drop=True)
     )
 
-    return Profit_SubCategory
+    return summary
+
+
+def profit_report(df: pd.DataFrame) -> dict:
+    return {
+        "total_profit": total_profit(df),
+        "profit_by_category": profit_by_category(df),
+        "profit_by_sub_category": profit_by_sub_category(df),
+    }
