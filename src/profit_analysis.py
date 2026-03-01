@@ -60,3 +60,40 @@ def profit_by_category(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     return summary
+
+def profit_by_subcategory(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculate total profit by sub-category from the Superstore dataset.
+
+    Args:
+        df: Cleaned Superstore DataFrame with 'Sub-Category' and 'Profit' columns.
+
+    Returns:
+        DataFrame with columns:
+            - Sub-Category
+            - Profit
+
+    Raises:
+        KeyError: If required columns are missing.
+        ValueError: If Profit contains no valid numeric values.
+    """
+
+    required_columns = ["Sub-Category", "Profit"]
+    for col in required_columns:
+        if col not in df.columns:
+            raise KeyError(f"Missing required column: '{col}'")
+
+    profit_series = pd.to_numeric(df["Profit"], errors="coerce") #profit is numeric
+
+    if profit_series.isna().all():
+        raise ValueError("Profit could not be calculated (no valid Profit values).")
+
+    Profit_SubCategory = (
+        df.assign(Profit=profit_series)
+        .groupby("Sub-Category", as_index=False)["Profit"]
+        .sum()
+        .sort_values(by="Profit", ascending=False)
+        .reset_index(drop=True)
+    )
+
+    return Profit_SubCategory
