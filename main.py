@@ -2,6 +2,8 @@ from src.data_loader import load_data
 from src.data_cleaning import convert_dates, handle_missing_values, validate_numeric_columns
 from src.sales_summary import sales_summary_report
 from src.profit_analysis import profit_report
+from src.customer_performance import total_sales_per_customer
+
 
 def main():
     try:    
@@ -43,6 +45,12 @@ def main():
         # Profit Analysis Report
         report = profit_report(df)
 
+        #Customer performance report
+        #User story5- Total sales per customer
+        sales_customer = total_sales_per_customer(df)
+        print("Total Sales per Customer:")
+        print(sales_customer.head())
+
         # ---- validations ----
         
         assert isinstance(report["total_profit"], float)
@@ -71,6 +79,9 @@ def main():
     except Exception as e:
         print("Error:", e)
 
+    
+
 
 if __name__ == "__main__":
     main()
+
