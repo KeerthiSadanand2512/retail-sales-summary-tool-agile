@@ -45,7 +45,9 @@ def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
     Identify top 10 customers by total sales.
 
     Args:
-        df: Cleaned Superstore DataFrame with 'Customer Name' and 'Sales' columns.
+        df: Cleaned Superstore DataFrame with 
+        - 'Customer Name'
+        - 'Sales' columns.
 
     Returns:
         DataFrame with columns:
@@ -63,10 +65,11 @@ def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
         raise KeyError(f"Missing required column(s): {sorted(missing)}")
 
     sales_series = pd.to_numeric(df["Sales"], errors="coerce")
-    if sales_series.dropna().empty:
+    #if sales_series.dropna().empty:
+    if sales_series.isna().all():
         raise ValueError("No valid numeric Sales values found.")
 
-    summary = (
+    Top_10 = (
         df.assign(Sales=sales_series)
           .groupby("Customer Name", as_index=False)["Sales"]
           .sum()
@@ -76,4 +79,4 @@ def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
           .reset_index(drop=True)
     )
 
-    return summary
+    return Top_10
