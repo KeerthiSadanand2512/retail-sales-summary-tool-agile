@@ -70,16 +70,17 @@ def main():
         print(report["profit_by_sub_category"].head(5))
         print(100*"=")
 
-        # Customer Performance Report    
-        sales_customer = total_sales_per_customer(df)
-        print("Total Sales per Customer:")
-        print(sales_customer.head())
-        print(100*"=")
- 
-        #adjusted the top_10_customer function to have each heading in different lines
-        print("=== Top 10 Customers by Total Sales: ===") 
-        print(top_10_customers(df))
+        # --- Customer Performance  ---
+        customer_sales = total_sales_per_customer(df)
+        print("=== Total Sales per Customer (Top 5 Preview) ===")
+        print(customer_sales.head())
         print(100 * "=")
+
+        top_customers = top_10_customers(df)
+        print("=== Top 10 Customers by Total Sales ===")
+        print(top_customers)
+        print(100 * "=")
+
 
 
         # Catch any unexpected exceptions to prevent crashing and provide feedback
