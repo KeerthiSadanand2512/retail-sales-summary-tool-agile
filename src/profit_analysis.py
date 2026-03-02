@@ -19,17 +19,19 @@ def total_profit(df: pd.DataFrame) -> float:
         raise KeyError("Missing required column: 'Profit'")
 
     profit_series = pd.to_numeric(df["Profit"], errors="coerce")
-
     if profit_series.dropna().empty:
         raise ValueError("No valid numeric Profit values found.")
 
-    total = float(profit_series.sum(skipna=True))
-    return total
+    return float(profit_series.sum(skipna=True))
 
 
 def profit_by_category(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate total profit grouped by category.
+
+    Notes:
+        Cleans Category values (strip + normalize whitespace) to prevent
+        duplicate-looking categories caused by hidden/trailing spaces.
 
     Args:
         df (pd.DataFrame): Cleaned Superstore DataFrame with 'Category' and 'Profit' columns.
@@ -45,22 +47,31 @@ def profit_by_category(df: pd.DataFrame) -> pd.DataFrame:
         ValueError: If no valid numeric Profit values exist.
     """
     required_columns = {"Category", "Profit"}
-    if not required_columns.issubset(df.columns):
-        missing = required_columns - set(df.columns)
+    missing = required_columns - set(df.columns)
+    if missing:
         raise KeyError(f"Missing required column(s): {sorted(missing)}")
 
-    profit_series = pd.to_numeric(df["Profit"], errors="coerce")
+    df_clean = df.copy()
 
+    # Clean Category text to avoid duplicates like "Technology" vs "Technology "
+    df_clean["Category"] = (
+        df_clean["Category"]
+        .astype(str)
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+    )
+
+    profit_series = pd.to_numeric(df_clean["Profit"], errors="coerce")
     if profit_series.dropna().empty:
         raise ValueError("No valid numeric Profit values found.")
 
     summary = (
-        df.assign(Profit=profit_series)
-          .groupby("Category", as_index=False)["Profit"]
-          .sum()
-          .rename(columns={"Profit": "Total Profit"})
-          .sort_values(by="Total Profit", ascending=False)
-          .reset_index(drop=True)
+        df_clean.assign(Profit=profit_series)
+        .groupby("Category", as_index=False)["Profit"]
+        .sum()
+        .rename(columns={"Profit": "Total Profit"})
+        .sort_values(by="Total Profit", ascending=False)
+        .reset_index(drop=True)
     )
 
     return summary
@@ -69,6 +80,10 @@ def profit_by_category(df: pd.DataFrame) -> pd.DataFrame:
 def profit_by_sub_category(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate total profit grouped by sub-category.
+
+    Notes:
+        Cleans Sub-Category values (strip + normalize whitespace) to prevent
+        duplicate-looking sub-categories caused by hidden/trailing spaces.
 
     Args:
         df (pd.DataFrame): Cleaned Superstore DataFrame with 'Sub-Category' and 'Profit' columns.
@@ -84,22 +99,31 @@ def profit_by_sub_category(df: pd.DataFrame) -> pd.DataFrame:
         ValueError: If no valid numeric Profit values exist.
     """
     required_columns = {"Sub-Category", "Profit"}
-    if not required_columns.issubset(df.columns):
-        missing = required_columns - set(df.columns)
+    missing = required_columns - set(df.columns)
+    if missing:
         raise KeyError(f"Missing required column(s): {sorted(missing)}")
 
-    profit_series = pd.to_numeric(df["Profit"], errors="coerce")
+    df_clean = df.copy()
 
+    # Clean Sub-Category text (same reason as Category)
+    df_clean["Sub-Category"] = (
+        df_clean["Sub-Category"]
+        .astype(str)
+        .str.strip()
+        .str.replace(r"\s+", " ", regex=True)
+    )
+
+    profit_series = pd.to_numeric(df_clean["Profit"], errors="coerce")
     if profit_series.dropna().empty:
         raise ValueError("No valid numeric Profit values found.")
 
     summary = (
-        df.assign(Profit=profit_series)
-          .groupby("Sub-Category", as_index=False)["Profit"]
-          .sum()
-          .rename(columns={"Profit": "Total Profit"})
-          .sort_values(by="Total Profit", ascending=False)
-          .reset_index(drop=True)
+        df_clean.assign(Profit=profit_series)
+        .groupby("Sub-Category", as_index=False)["Profit"]
+        .sum()
+        .rename(columns={"Profit": "Total Profit"})
+        .sort_values(by="Total Profit", ascending=False)
+        .reset_index(drop=True)
     )
 
     return summary
