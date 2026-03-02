@@ -1,82 +1,69 @@
-
 import pandas as pd
 
 
-#userstory5- totalsales_per customer
 def total_sales_per_customer(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate total sales per customer.
 
     Args:
-        df (pd.DataFrame): Cleaned Superstore DataFrame.
+        df (pd.DataFrame): Cleaned Superstore DataFrame containing
+                           'Customer ID', 'Customer Name', and 'Sales'.
 
     Returns:
-        pd.DataFrame: DataFrame with total sales per customer.
-
-    Raises:
-        KeyError: If required columns are missing.
-        ValueError: If Sales column has no valid numeric values.
-    """
-
-    required_columns = ["Customer ID", "Customer Name", "Sales"]
-
-    for col in required_columns:
-        if col not in df.columns:
-            raise KeyError(f"Missing required column: '{col}'")
-
-    # Convert Sales to numeric
-    df["Sales"] = pd.to_numeric(df["Sales"], errors="coerce")
-
-    if df["Sales"].notna().sum() == 0:
-        raise ValueError("Sales column contains no valid numeric values.")
-
-    # Group by customer
-    sales_per_customer = (
-        df.groupby(["Customer ID", "Customer Name"])["Sales"]
-        .sum()
-        .reset_index()
-        .sort_values(by="Sales", ascending=False)
-    )
-
-    return sales_per_customer
-
-def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Identify top 10 customers by total sales.
-
-    Args:
-        df: Cleaned Superstore DataFrame with 
-        - 'Customer Name'
-        - 'Sales' columns.
-
-    Returns:
-        DataFrame with columns:
+        pd.DataFrame: DataFrame with columns:
+            - Customer ID
             - Customer Name
             - Total Sales
         Sorted by Total Sales descending.
 
     Raises:
         KeyError: If required columns are missing.
-        ValueError: If no valid sales values exist.
+        ValueError: If no valid numeric Sales values exist.
     """
-    required = {"Customer Name", "Sales"}
-    missing = required - set(df.columns)
-    if missing:
+    required_columns = {"Customer ID", "Customer Name", "Sales"}
+    if not required_columns.issubset(df.columns):
+        missing = required_columns - set(df.columns)
         raise KeyError(f"Missing required column(s): {sorted(missing)}")
 
     sales_series = pd.to_numeric(df["Sales"], errors="coerce")
-    #if sales_series.dropna().empty:
-    if sales_series.isna().all():
+
+    if sales_series.dropna().empty:
         raise ValueError("No valid numeric Sales values found.")
 
-    Top_10 = (
+    summary = (
         df.assign(Sales=sales_series)
-          .groupby("Customer Name", as_index=False)["Sales"]
+          .groupby(["Customer ID", "Customer Name"], as_index=False)["Sales"]
           .sum()
           .rename(columns={"Sales": "Total Sales"})
           .sort_values(by="Total Sales", ascending=False)
-          .head(10)
           .reset_index(drop=True)
     )
 
-    return Top_10
+    return summary
+
+
+def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Identify the top 10 customers by total sales.
+
+    Args:
+        df (pd.DataFrame): Cleaned Superstore DataFrame containing
+                           'Customer ID', 'Customer Name', and 'Sales'.
+
+    Returns:
+        pd.DataFrame: DataFrame with columns:
+            - Customer ID
+            - Customer Name
+            - Total Sales
+        Sorted by Total Sales descending (Top 10 only).
+
+    Raises:
+        KeyError: If required columns are missing.
+        ValueError: If no valid numeric Sales values exist.
+    """
+    full_summary = total_sales_per_customer(df)
+
+    if full_summary.empty:
+        raise ValueError("Customer sales summary is empty.")
+
+    return full_summary.head(10)
