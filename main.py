@@ -75,9 +75,12 @@ def main():
         print("Total Sales per Customer:")
         print(sales_customer.head())
         print(100*"=")
-       
-        print("Top 10 Customers by Total Sales:", top_10_customers(df))
-        print(100*"=")
+ 
+        #adjusted the top_10_customer function to have each heading in different lines
+        print("=== Top 10 Customers by Total Sales: ===") 
+        print(top_10_customers(df))
+        print(100 * "=")
+
 
         # Catch any unexpected exceptions to prevent crashing and provide feedback
     except Exception as e:
