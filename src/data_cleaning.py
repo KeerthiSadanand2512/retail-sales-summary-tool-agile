@@ -3,13 +3,18 @@ import pandas as pd
 
 def convert_dates(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Convert Order Date and Ship Date columns to datetime.
+    Convert 'Order Date' and 'Ship Date' columns to datetime.
 
-    Returns a NEW DataFrame (does not mutate the original).
+    Args:
+        df (pd.DataFrame): Raw dataset containing date columns.
+
+    Returns:
+        pd.DataFrame: Copy of the dataset with datetime-converted date columns.
+
+    Raises:
+        KeyError: If 'Order Date' or 'Ship Date' columns are missing.
     """
     df_clean = df.copy()
-
-    # Superstore commonly has these exact column names
     date_cols = ["Order Date", "Ship Date"]
 
     for col in date_cols:
@@ -23,41 +28,73 @@ def convert_dates(df: pd.DataFrame) -> pd.DataFrame:
 
 def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Handle missing values with a simple, explainable strategy:
+    Handle missing values using a simple, explainable strategy.
+
+    Strategy:
     - Drop rows where critical fields are missing (Sales/Profit/Quantity)
     - Fill missing Discount with 0 (common assumption in retail data)
-    - Leave non-critical text fields as-is (or fill with 'Unknown' if needed)
+    - Leave non-critical text fields unchanged
 
-    Returns a NEW DataFrame.
+    Args:
+        df (pd.DataFrame): Dataset after date conversion (or raw).
+
+    Returns:
+        pd.DataFrame: Cleaned dataset with missing values handled.
     """
     df_clean = df.copy()
 
-    # Drop rows missing critical numeric fields (cannot analyze these reliably)
     critical_cols = ["Sales", "Profit", "Quantity"]
     existing_critical = [c for c in critical_cols if c in df_clean.columns]
     if existing_critical:
         df_clean = df_clean.dropna(subset=existing_critical)
 
-    # Fill discount missing with 0 (assumption: no discount recorded => 0)
     if "Discount" in df_clean.columns:
         df_clean["Discount"] = df_clean["Discount"].fillna(0)
-        return df_clean
+
+    return df_clean
+
 
 def validate_numeric_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Validate and enforce numeric datatypes for key numeric columns.
+
+    Columns enforced:
+    - Sales, Profit, Quantity, Discount
+
+    Rules:
+    - Convert numeric columns using pd.to_numeric(errors='coerce')
+    - If Discount column is missing, create it with default 0.0
+    - Drop rows where Sales/Profit/Quantity become NaN after conversion
+    - Convert Quantity to int after cleaning
+
+    Args:
+        df (pd.DataFrame): Dataset after missing value handling.
+
+    Returns:
+        pd.DataFrame: Dataset with validated numeric columns.
+
+    Raises:
+        KeyError: If Sales, Profit, or Quantity columns are missing.
+        ValueError: If no valid rows remain after validation.
+    """
     df_clean = df.copy()
 
-    for col in ["Sales", "Profit", "Quantity", "Discount"]:
-        if col in df_clean.columns:
-            df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
-        else:
-            if col == "Discount":
-                df_clean["Discount"] = 0.0
-            else:
-                raise KeyError(f"Missing expected numeric column: '{col}'")
+    required_numeric = ["Sales", "Profit", "Quantity"]
+    for col in required_numeric:
+        if col not in df_clean.columns:
+            raise KeyError(f"Missing expected numeric column: '{col}'")
 
-    df_clean = df_clean.dropna(subset=["Sales", "Profit", "Quantity", "Discount"])
+    if "Discount" not in df_clean.columns:
+        df_clean["Discount"] = 0.0
+
+    for col in ["Sales", "Profit", "Quantity", "Discount"]:
+        df_clean[col] = pd.to_numeric(df_clean[col], errors="coerce")
+
+    df_clean = df_clean.dropna(subset=["Sales", "Profit", "Quantity"])
+
+    if df_clean.empty:
+        raise ValueError("No valid rows remain after numeric validation.")
 
     df_clean["Quantity"] = df_clean["Quantity"].astype(int)
 
     return df_clean
-
