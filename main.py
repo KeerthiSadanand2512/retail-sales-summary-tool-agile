@@ -2,6 +2,8 @@ from src.data_loader import load_data
 from src.data_cleaning import convert_dates, handle_missing_values, validate_numeric_columns
 from src.sales_summary import sales_summary_report
 from src.profit_analysis import profit_report
+from src.customer_performance import total_sales_per_customer, top_10_customers
+
 
 def main():
     try:    
@@ -67,10 +69,27 @@ def main():
         print("\nProfit by Sub-Category (Top 5):")
         print(report["profit_by_sub_category"].head(5))
         print(100*"=")
+
+        # --- Customer Performance  ---
+        customer_sales = total_sales_per_customer(df)
+        print("=== Total Sales per Customer (Top 5 Preview) ===")
+        print(customer_sales.head())
+        print(100 * "=")
+
+        top_customers = top_10_customers(df)
+        print("=== Top 10 Customers by Total Sales ===")
+        print(top_customers)
+        print(100 * "=")
+
+
+
         # Catch any unexpected exceptions to prevent crashing and provide feedback
     except Exception as e:
         print("Error:", e)
 
+    
+
 
 if __name__ == "__main__":
     main()
+
