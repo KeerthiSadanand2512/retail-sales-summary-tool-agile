@@ -27,47 +27,47 @@ def main():
         print(100*"=")
 
         # Sales Summary Report
-        report = sales_summary_report(df)
+        sales_report = sales_summary_report(df)
 
         print("=== Total Sales ===")
-        print(report["total_sales"])
+        print(sales_report["total_sales"])
         print(100*"=")
 
         print("=== Sales by Region ===")
-        print(report["sales_by_region"])
+        print(sales_report["sales_by_region"])
         print(100*"=")
 
         print("=== Sales by Category ===")
-        print(report["sales_by_category"])
+        print(sales_report["sales_by_category"])
         print(100*"=")
 
 
         # Profit Analysis Report
-        report = profit_report(df)
+        profit_report_data = profit_report(df)
 
         # ---- validations ----
         
-        assert isinstance(report["total_profit"], float)
+        assert isinstance(profit_report_data["total_profit"], float)
 
-        assert not report["profit_by_category"].empty
-        assert "Category" in report["profit_by_category"].columns
-        assert "Total Profit" in report["profit_by_category"].columns
+        assert not profit_report_data["profit_by_category"].empty
+        assert "Category" in profit_report_data["profit_by_category"].columns
+        assert "Total Profit" in profit_report_data["profit_by_category"].columns
 
-        assert not report["profit_by_sub_category"].empty
-        assert "Sub-Category" in report["profit_by_sub_category"].columns
-        assert "Total Profit" in report["profit_by_sub_category"].columns
+        assert not profit_report_data["profit_by_sub_category"].empty
+        assert "Sub-Category" in profit_report_data["profit_by_sub_category"].columns
+        assert "Total Profit" in profit_report_data["profit_by_sub_category"].columns
        
         # ---- Print Results ----
         print("Profit Report Generated Successfully")
-        print("Total Profit:", report["total_profit"])
+        print("Total Profit:", profit_report_data["total_profit"])
         print(100*"=")
 
         print("\nProfit by Category (Top 5):")
-        print(report["profit_by_category"].head(5))
+        print(profit_report_data["profit_by_category"].head(5))
         print(100*"=")
 
         print("\nProfit by Sub-Category (Top 5):")
-        print(report["profit_by_sub_category"].head(5))
+        print(profit_report_data["profit_by_sub_category"].head(5))
         print(100*"=")
 
         # --- Customer Performance  ---

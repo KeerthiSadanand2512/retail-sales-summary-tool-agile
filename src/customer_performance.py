@@ -69,7 +69,7 @@ def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
     if sales_series.isna().all():
         raise ValueError("No valid numeric Sales values found.")
 
-    Top_10 = (
+    top_10 = (
         df.assign(Sales=sales_series)
           .groupby("Customer Name", as_index=False)["Sales"]
           .sum()
@@ -79,4 +79,4 @@ def top_10_customers(df: pd.DataFrame) -> pd.DataFrame:
           .reset_index(drop=True)
     )
 
-    return Top_10
+    return top_10
