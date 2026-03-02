@@ -115,8 +115,10 @@ def sales_by_category(df: pd.DataFrame) -> pd.DataFrame:
 
     return category_sales
 
+# Return type annotation added to enforce clear function contract
+# and strengthen separation of logic from presentation
 
-def sales_summary_report(df: pd.DataFrame) -> dict:
+def sales_summary_report(df: pd.DataFrame) -> dict[str, object]:
     """
     Generate a structured sales summary report.
 

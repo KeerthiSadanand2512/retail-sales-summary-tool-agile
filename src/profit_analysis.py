@@ -128,8 +128,10 @@ def profit_by_sub_category(df: pd.DataFrame) -> pd.DataFrame:
 
     return summary
 
+# Return type annotation added to enforce clear function contract
+# and strengthen separation of logic from presentation
 
-def profit_report(df: pd.DataFrame) -> dict:
+def profit_report(df: pd.DataFrame) -> dict[str, object]:
     """
     Generate structured profit analysis report.
 
