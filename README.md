@@ -10,6 +10,19 @@ Deliver a modular Python tool that generates key retail insights from the Supers
 - src/ : modular Python functions
 - main.py : entry point
 
+## Features
+
+The tool generates:
+
+- Total Sales
+- Sales by Region
+- Sales by Category
+- Total Profit
+- Profit by Category
+- Profit by Sub-Category
+- Total Sales per Customer
+- Top 10 Customers by Total Sales
+
 ## How to Run
 1. Install requirements
 2. Run main.py
